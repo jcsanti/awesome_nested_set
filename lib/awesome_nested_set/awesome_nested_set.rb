@@ -102,6 +102,12 @@ module CollectiveIdea #:nodoc:
           :touch => acts_as_nested_set_options[:touch]
         }
         options[:optional] = true if ActiveRecord::VERSION::MAJOR >= 5
+        # Without the following line, the call to # belongs_to will fail due to a change in
+        # ActiveRecord::Associations::Builder::BelongsTo#valid_options, which was brought at some point
+        # between Rails 6.0.3.2 and Rails edge (7af59e16a255).
+        # ":polymorphic" is now added to the returned array of valid options only if the belongs_to
+        # association is defined as "polymorphic: true"...
+        options.delete(:polymorphic) unless options[:polymorphic]
         belongs_to :parent, options
       end
 
